@@ -1,77 +1,46 @@
 function RegisterClient(){
-    this.clientId = [];
-    this.deposit = 0;
-    this.productId = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
-    this.productBought = [];
+    this.clients = [];
     this.minDeposit = 100;
 }
 
 function RegisterDistributor(){
-    this.distributorId = [];
-    this.deposit = 0;
-    this.productId = [1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12];
-    this.productDestributed = [];
+    this.distributors = [];
     this.minDeposit = 200;
 }
 
-RegisterClient.prototype.addClient = function(_id, _deposit, _product){
-    if(_deposit < this.minDeposit){
-        return "Please deposit more then minimum Deposit Amount (100)";
+RegisterClient.prototype.addClient = function(id,deposit){
+    if(deposit<this.minDeposit){
+        return "The minimum deposit Amount is 100";
     }
-    for(let j=0; j<this.clientId.length; j++){
-        if(_id == this.clientId[j]){
-            return "You are already Registered";
+    for(let i=0;i<this.clients.length;i++){
+        if(id==this.clients[i].clientId){
+            return "The Client Id is already in use";
         }
     }
-    for(let i=0; i<this.productId.length; i++){
-        
-        if(_product == this.productId[i]){
-            const newClient = {
-                id : _id,
-                product : _product
-            }
-            
-            this.clientId.push(newClient.id);
-            this.productBought.push(newClient.product);
-            
-            return "Success! You are Registered as a Client!!";
-        }
-        else{
-            if(i == this.clientId.length - 1){
-                return "Product does not exist in the system";
-            }
-        }
+    const client = {
+        clientId : id,
+        deposit: parseFloat(deposit),
     }
+    this.clients.push(client);
+    return "Success!! You have been registered";
 }
 
-RegisterDistributor.prototype.addDistributor = function(_id, _deposit, _product){
-    if(_deposit < this.minDeposit){
-        return "Please deposit more then minimum Deposit Amount (200)";
+RegisterDistributor.prototype.addDistributor = function(id,deposit){
+    if(deposit<this.minDeposit){
+        return "The minimum deposit Amount is 200";
     }
-    for(let j=0; j<this.distributorId.length; j++){
-        if(_id == this.distributorId[j]){
-            return "You are already Registered";
+    for(let i=0;i<this.distributors.length;i++){
+        if(id==this.distributors[i]){
+            return "The Distributor Id is already in use";
         }
     }
-    for(let i=0; i<this.productId.length; i++){
-        if(_product == this.productId[i]){
-            const newDistributor = {
-                id : _id,
-                product : _product
-            }
-
-            this.distributorId.push(newDistributor.id);
-            this.productDestributed.push(newDistributor.product);
-            
-            return "Success! You are Registered as a Distributor!!";
-        }
-        else{
-            if(i == this.clientId.length - 1){
-                return "Product does not exist in the system";
-            }
-        }
+    const distributor = {
+        distributorId : id,
+        deposit: parseFloat(deposit),
+        products:[],
     }
+    this.distributors.push(distributor);
+    return "Success!! You have been registered";
 }
 
-module.exports = RegisterClient;
-module.exports = RegisterDistributor;
+module.exports ={ RegisterClient,RegisterDistributor};
