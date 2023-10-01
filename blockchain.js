@@ -1,7 +1,8 @@
 const SHA = require("crypto-js/sha256");
-const transaction = require('./transactions');
-const exchange = new transaction();
-
+// const transaction = require('./transaction');
+const prompt = require('prompt-sync')();
+// const exchange = new transaction();
+ 
 class Blockchain {
     constructor(){
         this.blockchain = [];
@@ -9,34 +10,34 @@ class Blockchain {
         this.newTransaction = [];
         this.genesisBlock();
     }
-
+ 
     genesisBlock(){
         const block = {
             data:'0',
             prevBlockHash : 0,
-            stake:0,
-            hash:SHA(0 + '0' + 0).toString(),
+            hash:SHA(0 + '0').toString(),
+            timestamp : Date.now(),
         };
         this.blockchain.push(block);
     }
-
+ 
     getLastBlock() {
         return this.blockchain[this.blockchain.length - 1];
     }
-
-    addBlock(data,stake){
+ 
+    addBlock(data){
         const block = {
             data:data,
             prevBlockHash : this.getLastBlock()?.hash,
-            stake:stake,
-            hash:SHA(data + this.getLastBlock()?.hash + stake).toString(),
+            hash:SHA(data + this.getLastBlock()?.hash).toString(),
+            timestamp : Date.now(),
         };
         this.blockchain.push(block);
     }
-
+ 
     calculateHash(block){
         try {
-            const blockString = (block.data+block.prevBlockHash+block.stake);
+            const blockString = (block.data+block.prevBlockHash);
             if (!blockString) {
                 throw new Error('Failed to stringify block for hash calculation.');
             }
@@ -46,7 +47,7 @@ class Blockchain {
             return null;  
         }
     }
-
+ 
     isChainValid(){
         for(let i=1;i<this.blockchain.length;i++){
             const currBlock = this.blockchain[i];
@@ -60,48 +61,68 @@ class Blockchain {
         }
         return true;
     }
-
-    addValidator(validator, stake) {
+ 
+    startVote(){
+        for(let i=0;i<this.validators.length;i++){
+            this.validators[i].voted=false;
+            this.validators[i].votes=parseInt(0);
+        }
+    }
+ 
+    addValidator(id,type,voted,votes) {
         this.validators.push({
-            address: validator,
-            stake: stake
+            id : id,
+            type : type,
+            voted: voted,
+            votes : votes,
         });
     }
-
-    addTransaction(productId, senderId, receiverId){
-        const transaction = {
-            productId: productId, 
-            senderId: senderId,
-            receiverId: receiverId,
-            timestamp: Date.now(),
-        };
-        this.newTransaction.push(transaction);
+ 
+    voteValidator(){
+        var id = prompt("Enter your Id: ");
+        var type = prompt("Enter 0 if you are a (client) or 1 if (Distributor): ");
+        let idx=0;
+        for(let i=0;i<this.validators.length;i++){
+            if(this.validators[i].id == id && this.validators[i].type==type){
+                if(this.validators.voted==true){
+                    return "You Have already Voted";
+                }
+                idx=i;
+                break;
+            }
+            else if(i==this.validators.length-1){
+                return "Enter a valid Id."; 
+            }
+        }
+        for(let v=0;v<this.validators.length;v++){
+            console.log(v + " to vote for " + this.validators[v].id +" with "+this.validators[v].votes +" votes.")
+        }
+        var vote = prompt("Choose your vote. You can only vote once per session: ");
+        console.log(this.validators);
+        this.validators[idx].voted=true;
+        this.validators[vote].votes = parseInt(this.validators[vote].votes)+1;
+        return "You Vote has been placed successfully";
     }
-
+ 
     selectValidators() {
-        this.validators.sort((a, b) => (a.stake > b.stake) ? -1 : 1);
+        this.validators.sort((a, b) => (a.votes > b.votes) ? -1 : 1);
+        if(this.validators.length<=2){
+            return this.validators;
+        }
         return this.validators.slice(0, Math.floor(this.validators.length / 3));
     }
-
-    validateBlock(block) {
+ 
+    validateBlock() {
         const validators = this.selectValidators();
         let validationCount = 0;
-
         for (let i = 0; i < validators.length; i++) {
-            if (validators[i].address === block.validator) {
+            if (validators[i].id === block.validator) {
                 validationCount++;
             }
         }
-
-        return validationCount >= Math.floor(validators.length / 3);
+ 
+        return validationCount >= Math.floor(validators.length*2/3);
     }
-
 }
-
-const blockchain = new Blockchain();
-console.log(blockchain.getLastBlock());
-blockchain.addBlock("dsjfnkjdsnfkjsdnfkj",400);
-console.log(blockchain.getLastBlock());
-console.log(blockchain.isChainValid())
-
+ 
 module.exports = Blockchain;
