@@ -77,13 +77,147 @@ while(whatNext != 9){
     }
     else if(whatNext == 2){
         if(blockchain.validateBlock()){
-            for(let i=0;i<exchange.allTransactions-1;i+=2){
-                const blockData = {
-                    transaction1 : exchange.allTransactions[i],
-                    transaction2 : exchange.allTransactions[i+1],
+            manuToDist = [];
+            let idx=0;
+            while(idx<exchange.allTransactions.length){
+                if(exchange.allTransactions[idx].type == 1){
+                    manuToDist.push(exchange.allTransactions[idx]);
+                    exchange.allTransactions.splice(idx,1);
                 }
+                else{
+                    idx++;
+                }
+            }
+            console.log(manuToDist);
+            while(manuToDist.length>=2){
+                for(let i=0;i<registerDistributors.distributors.length;i++){
+                    if(registerDistributors.distributors[i].distributorId==manuToDist[0].buyer){
+                        registerDistributors.distributors[i].deposit = parseFloat(registerDistributors.distributors[i].deposit) - parseFloat(manuToDist[1].price);
+                        if(registerDistributors.distributors[i].products[manuToDist[0].product]==undefined){
+                            registerDistributors.distributors[i].products[manuToDist[0].product] = 1;
+                        }
+                        else{
+                            registerDistributors.distributors[i].products[manuToDist[0].product]++;
+                        }
+                        manuToDist[0].productId = SHA(manuToDist[0].productId+registerDistributors.distributors[i].privateKey);
+                    }
+                    if(registerDistributors.distributors[i].distributorId==manuToDist[1].buyer){
+                        registerDistributors.distributors[i].deposit = parseFloat(registerDistributors.distributors[i].deposit) - parseFloat(manuToDist[1].price);
+                        if(registerDistributors.distributors[i].products[manuToDist[1].product]==undefined){
+                            registerDistributors.distributors[i].products[manuToDist[1].product] = 1;
+                        }
+                        else{
+                            registerDistributors.distributors[i].products[manuToDist[1].product]++;
+                        }
+                        manuToDist[1].productId = SHA(manuToDist[1].productId+registerDistributors.distributors[i].privateKey);
+                    }
+                }
+                const blockData = [manuToDist[0],manuToDist[1]];
+                manuToDist.splice(0,2);
+                console.log(blockData);
                 blockchain.addBlock(blockData);
             }
+
+            while(exchange.allTransactions.length>=2){
+                for(let i=0;i<registerDistributors.distributors.length;i++){
+                    if(registerDistributors.distributors[i].distributorId==exchange.allTransactions[0].buyer){
+                        registerDistributors.distributors[i].deposit = parseFloat(registerDistributors.distributors[i].deposit) + parseFloat(exchange.allTransactions[1].price);
+                        if(registerDistributors.distributors[i].products[exchange.allTransactions[0].product]>1){
+                            registerDistributors.distributors[i].products[exchange.allTransactions[0].product] --;
+                        }
+                        else{
+                            registerDistributors.distributors[i].products[exchange.allTransactions[0].product]=undefined;
+                        }
+                        exchange.allTransactions[0].productId = SHA(exchange.allTransactions[0].productId+registerDistributors.distributors[i].privateKey);
+                        if(exchange.allTransactions[0].status=="Dispatching"){
+                            exchange.allTransactions[0].productId = SHA(exchange.allTransactions[0].productId+registerDistributors.distributors[i].privateKey).toString();
+                        }
+                        registerDistributors.distributors[i].status=0;
+                    }
+                    if(registerDistributors.distributors[i].distributorId==exchange.allTransactions[1].buyer){
+                        registerDistributors.distributors[i].deposit = parseFloat(registerDistributors.distributors[i].deposit) + parseFloat(exchange.allTransactions[1].price);
+                        if(registerDistributors.distributors[i].products[exchange.allTransactions[1].product]>1){
+                            registerDistributors.distributors[i].products[exchange.allTransactions[1].product] --;
+                        }
+                        else{
+                            registerDistributors.distributors[i].products[exchange.allTransactions[1].product] = undefined;
+                        }
+                        exchange.allTransactions[1].productId = SHA(exchange.allTransactions[1].productId+registerDistributors.distributors[i].privateKey);
+                        if(exchange.allTransactions[1].status=="Dispatching"){
+                            exchange.allTransactions[1].productId = SHA(exchange.allTransactions[1].productId+registerDistributors.distributors[i].privateKey).toString();
+                        }
+                        registerDistributors.distributors[i].status=0;
+                    }
+                }
+                
+                for(let i=0;i<registerClients.clients.length;i++){
+                    if(registerClients.clients[i].clientId == exchange.allTransactions[0].buyer){
+                        registerClients.clients[i].deposit = parseFloat(registerClients.clients[i].deposit) - parseFloat(exchange.allTransactions[0].price);
+                        exchange.allTransactions[0].status="Received";
+                        exchange.allTransactions[0].productId = SHA(exchange.allTransactions[0].productId+registerClients.clients[i].privateKey).toString();
+                        registerClients.clients[i].purchases.push(exchange.allTransactions[0]);
+                    }
+                    if(registerClients.clients[i].clientId == exchange.allTransactions[1].buyer){
+                        registerClients.clients[i].deposit = parseFloat(registerClients.clients[i].deposit) - parseFloat(exchange.allTransactions[1].price);
+                        exchange.allTransactions[1].status="Received";
+                        exchange.allTransactions[1].productId = SHA(exchange.allTransactions[1].productId+registerClients.clients[i].privateKey).toString();
+                        registerClients.clients[i].purchases.push(exchange.allTransactions[1]);
+                    }
+                }
+                const blockData = [exchange.allTransactions[0],exchange.allTransactions[1]];
+                console.log(blockData);
+                exchange.allTransactions.splice(0,2);
+                blockchain.addBlock(blockData);
+            } 
+            if(manuToDist.length==1&&exchange.allTransactions.length==1){
+                for(let i=0;i<registerDistributors.distributors.length;i++){
+                    if(registerDistributors.distributors[i].distributorId==manuToDist[0].buyer){
+                        registerDistributors.distributors[i].deposit = parseFloat(registerDistributors.distributors[i].deposit) - parseFloat(manuToDist[1].price);
+                        if(registerDistributors.distributors[i].products[manuToDist[0].product]==undefined){
+                            registerDistributors.distributors[i].products[manuToDist[0].product] = 1;
+                        }
+                        else{
+                            registerDistributors.distributors[i].products[manuToDist[0].product]++;
+                        }
+                        manuToDist[0].productId = SHA(manuToDist[0].productId+registerDistributors.distributors[i].privateKey);
+                    }
+                }
+                for(let i=0;i<registerDistributors.distributors.length;i++){
+                    if(registerDistributors.distributors[i].distributorId==exchange.allTransactions[0].buyer){
+                        registerDistributors.distributors[i].deposit = parseFloat(registerDistributors.distributors[i].deposit) + parseFloat(exchange.allTransactions[1].price);
+                        if(registerDistributors.distributors[i].products[exchange.allTransactions[0].product]>1){
+                            registerDistributors.distributors[i].products[exchange.allTransactions[0].product] --;
+                        }
+                        else{
+                            registerDistributors.distributors[i].products[exchange.allTransactions[0].product]=undefined;
+                        }
+                        exchange.allTransactions[0].productId = SHA(exchange.allTransactions[0].productId+registerDistributors.distributors[i].privateKey);
+                        if(exchange.allTransactions[0].status=="Dispatching"){
+                            exchange.allTransactions[0].productId = SHA(exchange.allTransactions[0].productId+registerDistributors.distributors[i].privateKey).toString();
+                        }
+                        registerDistributors.distributors[i].status=0;
+                    }
+                }
+                
+                for(let i=0;i<registerClients.clients.length;i++){
+                    if(registerClients.clients[i].clientId == exchange.allTransactions[0].buyer){
+                        registerClients.clients[i].deposit = parseFloat(registerClients.clients[i].deposit) - parseFloat(exchange.allTransactions[0].price);
+                        exchange.allTransactions[0].status="Received";
+                        exchange.allTransactions[0].productId = SHA(exchange.allTransactions[0].productId+registerClients.clients[i].privateKey).toString();
+                        registerClients.clients[i].purchases.push(exchange.allTransactions[0]);
+                    }
+                }
+                const blockData = [exchange.allTransactions[0],manuToDist[0]];
+                exchange.allTransactions.splice(0,1);
+                console.log(blockData);
+                blockchain.addBlock(blockData);
+            }
+            else if(manuToDist.length==1){
+                exchange.allTransactions.push(manuToDist[0]);
+            }
+        }
+        else{
+            exchange.allTransactions=[];
         }
         blockchain.startVote();
     }
@@ -129,6 +263,9 @@ while(whatNext != 9){
                 message = 'Client Not Found';
             }
         }
+        if(registerClients.clients.length==0){
+            message='Client Not Found';
+        }
         var product = prompt('Select the product you wish to buy (1-20) : ');
         var amount_added = prompt('Enter the amount you wish to add to your balance : ');
         let message = "";
@@ -140,31 +277,40 @@ while(whatNext != 9){
         }
         
         for(let i=0; i<registerDistributors.distributors.length && !message.length; i++){
-            for(let j=0; j<registerDistributors.distributors[i].products.length && !message.length; j++){
-                if(registerDistributors.distributors[i].products[j]==product){
-                    for(let k=0; k<registerClients.clients.length && !message.length; k++){
-                        if(registerClients.clients[k].clientId == clientId){
-                            if(parseFloat(registerClients.clients[k].deposit) - parseFloat(exchange.prices[product-1]) < parseFloat(registerClients.minDeposit)){
-                                message=`Couldnt purchase the product ${product} as your minimum balance after purchase will be less than ${registerClients.minDeposit}`;
+            if(registerDistributors.distributors[i].products[product]){
+                for(let k=0; k<registerClients.clients.length && !message.length; k++){
+                    if(registerClients.clients[k].clientId == clientId){
+                        if(parseFloat(registerClients.clients[k].deposit) - parseFloat(exchange.prices[product-1]) < parseFloat(registerClients.minDeposit)){
+                            message=`Couldnt purchase the product ${product} as your minimum balance after purchase will be less than ${registerClients.minDeposit}`;
+                        }
+                        else{
+                            dist_status = "Dispatching";
+                            key = SHA(product+clientId+registerDistributors.distributors[i].distributorId+Date.now()).toString();
+                            if(registerDistributors.distributors[i].status==0){
+                                dist_status = "Dispatched";
+                                key = SHA(key+registerDistributors.distributors[i].privateKey).toString();
+                            }
+                            if(registerDistributors.distributors[i].products[product]>1){
+                                registerDistributors.distributors[i].products[product]--;
                             }
                             else{
-                                registerClients.clients[k].deposit -= exchange.prices[product-1];
-                                const newProduct = registerDistributors.distributors[i].products.filter((element) => element !== product);
-                                registerDistributors.distributors[i].products = newProduct;
-                                registerDistributors.distributors[i].deposit += exchange.prices[product-1];
-                                const new_D_to_C_transaction={
-                                    buyer:clientId,
-                                    product:product,
-                                    price:exchange.prices[product-1],
-                                    seller:registerDistributors.distributors[i].distributorId,
-                                    type:0,
-                                }
-                                exchange.allTransactions.push(new_D_to_C_transaction);
-                                message="Success!! Product bought";
-                                console.log(registerDistributors.distributors[i]);
+                                registerDistributors.distributors[i].products[product]=undefined;
                             }
-                            break;
+                            const new_D_to_C_transaction={
+                                buyer:clientId,
+                                product:product,
+                                price:exchange.prices[product-1],
+                                seller:registerDistributors.distributors[i].distributorId,
+                                type:0,
+                                timestamp: Date.now(),
+                                productId : key,
+                                status: dist_status,
+                            }
+                            exchange.allTransactions.push(new_D_to_C_transaction);
+                            message="Success!! Product bought";
+                            console.log(registerDistributors.distributors[i]);
                         }
+                        break;
                     }
                 }
             }
@@ -185,14 +331,16 @@ while(whatNext != 9){
                     message=`Couldnt purchase the product ${product} as your minimum balance after purchase will be less than ${registerClients.minDeposit}`;
                 }
                 else{
-                    registerDistributors.distributors[i].deposit = parseFloat(registerDistributors.distributors[i].deposit) - parseFloat(exchange.prices[product-1]);
-                    registerDistributors.distributors[i].products.push(product);
+                    // registerDistributors.distributors[i].deposit = parseFloat(registerDistributors.distributors[i].deposit) - parseFloat(exchange.prices[product-1]);
+                    // registerDistributors.distributors[i].products.push(product);
                     const new_M_to_D_transaction={
                         buyer:distId,
                         product:product,
                         price:exchange.prices[product-1],
                         seller:"Manufacturer",
                         type:1,
+                        timestamp: Date.now(),
+                        productId : SHA(product+distId+"Manufacturer"+Date.now()).toString(),
                     }
                     exchange.allTransactions.push(new_M_to_D_transaction);
                     message="Success!! Product bought";
@@ -200,11 +348,13 @@ while(whatNext != 9){
                 console.log(registerDistributors.distributors[i]);
             }
             else if(i == registerDistributors.distributors.length - 1){
-                message = 'Client Not Found';
+                message = 'Distributor Not Found';
             }
-            console.log(message);
         }
-        
+        if(registerDistributors.distributors.length==0){
+            message = 'Distributor Not Found';
+        }
+        console.log(message);
     }
     else if(whatNext == 7){
         console.log(blockchain.voteValidator());

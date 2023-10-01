@@ -29,7 +29,7 @@ class Blockchain {
         const block = {
             data:data,
             prevBlockHash : this.getLastBlock()?.hash,
-            hash:SHA(data + this.getLastBlock()?.hash).toString(),
+            hash:SHA(data[0] + data[1] + this.getLastBlock()?.hash).toString(),
             timestamp : Date.now(),
         };
         this.blockchain.push(block);
@@ -37,7 +37,7 @@ class Blockchain {
  
     calculateHash(block){
         try {
-            const blockString = (block.data+block.prevBlockHash);
+            const blockString = (block.data[0] + block.data[1] +block.prevBlockHash);
             if (!blockString) {
                 throw new Error('Failed to stringify block for hash calculation.');
             }
@@ -116,7 +116,7 @@ class Blockchain {
         const validators = this.selectValidators();
         let validationCount = 0;
         for (let i = 0; i < validators.length; i++) {
-            if (validators[i].id === block.validator) {
+            if(this.isChainValid()){
                 validationCount++;
             }
         }
