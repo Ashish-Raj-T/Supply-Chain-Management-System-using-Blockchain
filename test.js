@@ -276,7 +276,7 @@ while(whatNext != 11){
     else if(whatNext == 3){
         var clientId = prompt('Enter a unique client Id : ');
         var deposit = prompt('Enter the deposit amount you wish to add (at least 100) : ')
-        let message = registerClients.addClient(clientId,deposit);
+        let message = registerClients.addClient(clientId,Number(deposit));
         console.log("All the Clients registered till now: ");
         console.log(registerClients.clients);
         if(message=="Success!! You have been registered"){
@@ -293,7 +293,7 @@ while(whatNext != 11){
     else if(whatNext == 4){   
         var distributorId = prompt('Enter a unique Distributor Id : ');
         var deposit = prompt('Enter the deposit amount you wish to add (at least 200) : ')
-        let message = registerDistributors.addDistributor(distributorId,deposit);
+        let message = registerDistributors.addDistributor(distributorId,Number(deposit));
         console.log("All the Distributors registered till now: ");
         console.log(registerDistributors.distributors);
         if(message=="Success!! You have been registered"){
@@ -325,7 +325,7 @@ while(whatNext != 11){
         var amount_added = prompt('Enter the amount you wish to add to your balance : ');
         for(let i=0;i<registerClients.clients.length;i++){
             if(registerClients.clients[i].clientId==clientId){
-                registerClients.clients[i].deposit += amount_added;
+                registerClients.clients[i].deposit += Number(amount_added);
                 break;
             }
         }
@@ -381,7 +381,16 @@ while(whatNext != 11){
         var distId = prompt("Enter your distributor Id : ");
         var product = prompt('Select the product you wish to buy (1-20) : ');
         var amount_added = prompt('Enter the amount you wish to add to your balance : ');
-        for(let i=0; i<registerDistributors.distributors.length; i++){
+        if(distId.length==0){
+            message="Invalid id";
+        }
+        if(product.length==0){
+            message="Invalid product";
+        }
+        if(amount_added.length==0){
+            message="Invalid amount";
+        }
+        for(let i=0; i<registerDistributors.distributors.length&&!message.length; i++){
             if(registerDistributors.distributors[i].distributorId==distId){
                 registerDistributors.distributors[i].deposit = Number(registerDistributors.distributors[i].deposit) + Number(amount_added);
                 if((registerDistributors.distributors[i].deposit) - (exchange.prices[product-1]) < (registerDistributors.minDeposit)){
@@ -442,20 +451,26 @@ while(whatNext != 11){
         }
         else if(productKey===recheck){
             if(transactionStatus.status=="Dispatched"||transactionStatus.status=="Dispatching"){
-                console.log(`The transaction is being validated. The current status of the product is ${transactionStatus.status}`);
                 for(let i=0;i<registerDistributors.distributors.length;i++){
                     if(registerDistributors.distributors[i].distributorId==transactionStatus.seller){
+                        console.log(`The transaction is being validated. The current status of the product is ${transactionStatus.status}`);
                         registerDistributors.distributors[i].deposit -= 50;
                         console.log(`The Distributor's current deposit has been reduced to ${registerDistributors.distributors[i].deposit}`);
+                    }
+                    else if(i==registerDistributors.distributors.length-1){
+                        console.log(`The product was not purchased be client ${cid}`);
                     }
                 }
             }
             else if(transactionStatus.status=="Received"){
-                console.log("The product has been delivered. Please generate QR code to check your transaction status.");
                 for(let i=0;i<registerClients.clients.length;i++){
                     if(registerClients.clients[i].clientId==cid){
+                        console.log("The product has been delivered. Please generate QR code to check your transaction status.");
                         registerClients.clients[i].deposit -= 50;
                         console.log(`Your current deposit has been reduced to ${registerClients.clients[i].deposit}`);
+                    }
+                    else if(i==registerClients.clients.length-1){
+                        console.log(`The product was not purchased be client ${cid}`);
                     }
                 }
             }

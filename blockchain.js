@@ -119,9 +119,15 @@ class Blockchain {
  
     validateBlock() {
         const validators = this.selectValidators();
-        console.log(`The top validators currently are: \n${validators}`);
+        console.log(`The top validators currently are: \n`);
         let validationCount = 0;
         for (let i = 0; i < validators.length; i++) {
+            if(validators[i].type==0){
+                console.log(`Client with client Id as ${validators[i].id}`);
+            }
+            else{
+                console.log(`Distributor with distributor Id as ${validators[i].id}`);
+            }
             if(this.isChainValid()){
                 validationCount++;
             }
