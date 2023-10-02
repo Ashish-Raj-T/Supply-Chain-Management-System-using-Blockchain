@@ -10,12 +10,12 @@ We are implementing the Merkle tree to calculate the root hash of all the transa
 Users can view the transaction history that is related to a product.
 
 # Technologies Used:
-##•	JavaScript
-##•	Node.js
-Packages Used:
-##•	Prompt-sync
-##•	qrcode-terminal
-##•	crypto-js/sha256
+## •	JavaScript
+## •	Node.js
+# Packages Used:
+## •	Prompt-sync
+## •	qrcode-terminal
+## •	crypto-js/sha256
 
 
 
@@ -24,28 +24,45 @@ Packages Used:
 # Working of Every Module:
 ## blockchain.js file:
 
-<h1>Blockchain ():</h1> This function initializes an empty array called blockchain, containing all the blocks in sequential order. It will also initialize an empty array called newTransaction, including all transactions chronologically. It will also create the genesis block.
-<br><h1>addBlock ():</h1> It will have parameters of transaction data, hash of the previous block, timestamp, and soup of the current block. It will create a new block with all its data and add it to the array "blockchain."
+### <h1>Blockchain ():</h1> 
+This function initializes an empty array called blockchain, containing all the blocks in sequential order. It will also initialize an empty array called newTransaction, including all transactions chronologically. It will also create the genesis block.
+### <br><h1>addBlock ():</h1> 
+It will have parameters of transaction data, hash of the previous block, timestamp, and soup of the current block. It will create a new block with all its data and add it to the array "blockchain."
 <br>
-<h1>getLastBlock ():</h1> This will return the last block in the array "blockchain."
-<br><h1>createNewTrans ():</h1> This will take property ID, seller ID, and buyer ID as parameters. It will create a new structure called 'newTransactions' with the seller, buyer, and property ID. This transaction will be added to the array 'newTransaction.'
-<br><h1>calculateHash ():</h1> This will take the previous block's hash, Merkel root, and data as parameters. This will use the sha256 algorithm to calculate the block's hash using all the parameters and current time.
+### <h1>getLastBlock ():</h1> 
+This will return the last block in the array "blockchain."
+### <br><h1>createNewTrans ():</h1> 
+This will take property ID, seller ID, and buyer ID as parameters. It will create a new structure called 'newTransactions' with the seller, buyer, and property ID. This transaction will be added to the array 'newTransaction.'
+### <br><h1>calculateHash ():</h1> 
+This will take the previous block's hash, Merkel root, and data as parameters. This will use the sha256 algorithm to calculate the block's hash using all the parameters and current time.
 
-<br><h1>printBlockchain ():</h1> Prints all the transactions in the blockchain mined till now.
-DPOS: Delegated Proof of Stake is a blockchain consensus mechanism where network users vote and elect delegates to validate the next block. Like a traditional proof-of-stake mechanism, DPoS uses a collateral staking system. However, it also uses a specific democratic process to address POS's limitations. 
-<br><h1>startVote ():</h1> Initializes all the validators votes to zero before calling the voteValidators function.
-<br><h1>addValidator ():</h1> adds clients or distributors to the validators array during registration.
-<br><h1>voteValidators ():</h1> All the validators vote to delegate the responsibility of validating a transaction before adding it to the blockchain.
-<br><h1>selectValidators ():</h1> The top 1/3 validators are selected to validate the transactions.
-<br><h1>isChainValid ():</h1> This function compares each block's hashes with its hash and the prevHash stored in league with the previous block's hash to validate the blockchain.
-<br><h1>validateBlock ():</h1> It considers the majority of 2/3 of people delegated to validate the blocks; if true, the block is added to the blockchain.
-<br><h1>merkelRoot ():</h1> It takes several transactions as a parameter. It implements the Merkel tree to calculate the Merkel root.
+### <br><h1>printBlockchain ():</h1> 
+Prints all the transactions in the blockchain mined till now.
+### DPOS: 
+Delegated Proof of Stake is a blockchain consensus mechanism where network users vote and elect delegates to validate the next block. Like a traditional proof-of-stake mechanism, DPoS uses a collateral staking system. However, it also uses a specific democratic process to address POS's limitations. 
+### <br><h1>startVote ():</h1> 
+Initializes all the validators votes to zero before calling the voteValidators function.
+### <br><h1>addValidator ():</h1> 
+adds clients or distributors to the validators array during registration.
+### <br><h1>voteValidators ():</h1> 
+All the validators vote to delegate the responsibility of validating a transaction before adding it to the blockchain.
+### <br><h1>selectValidators ():</h1> 
+The top 1/3 validators are selected to validate the transactions.
+### <br><h1>isChainValid ():</h1> 
+This function compares each block's hashes with its hash and the prevHash stored in league with the previous block's hash to validate the blockchain.
+### <br><h1>validateBlock ():</h1> 
+It considers the majority of 2/3 of people delegated to validate the blocks; if true, the block is added to the blockchain.
+### <br><h1>merkelRoot ():</h1> 
+It takes several transactions as a parameter. It implements the Merkel tree to calculate the Merkel root.
 
 # registration.js file: 
 
-<h1>Registration ():</h1> It initializes the clients and distributors array, which will contain the IDs of all the registered users. It will also initialize the minimum deposit required to register as a client or distributor.
-<h1>addClient ():</h1> This function will check if the client ID requested by the user is available in the client array, and if it is not present, it will register the user by adding his ID to the client array.
-<h1>addDistributor ():</h1> This function will check if the distributor ID requested by the user is available in the client array, and if it is not present, it will register the user by adding his ID to the distributor array.
+## <h1>Registration ():</h1> 
+It initializes the clients and distributors array, which will contain the IDs of all the registered users. It will also initialize the minimum deposit required to register as a client or distributor.
+## <h1>addClient ():</h1> 
+This function will check if the client ID requested by the user is available in the client array, and if it is not present, it will register the user by adding his ID to the client array.
+## <h1>addDistributor ():</h1> 
+This function will check if the distributor ID requested by the user is available in the client array, and if it is not present, it will register the user by adding his ID to the distributor array.
 
 # transaction.js ():
 
