@@ -7,7 +7,6 @@ class Blockchain {
     constructor(){
         this.blockchain = [];
         this.validators = [];
-        this.newTransaction = [];
         this.genesisBlock();
     }
  
@@ -29,7 +28,7 @@ class Blockchain {
         const block = {
             data:data,
             prevBlockHash : this.getLastBlock()?.hash,
-            hash:SHA(data + this.getLastBlock()?.hash).toString(),
+            hash:SHA(data[0] + data[1] + this.getLastBlock()?.hash).toString(),
             timestamp : Date.now(),
         };
         this.blockchain.push(block);
@@ -37,7 +36,7 @@ class Blockchain {
  
     calculateHash(block){
         try {
-            const blockString = (block.data+block.prevBlockHash);
+            const blockString = (block.data[0] + block.data[1] +block.prevBlockHash);
             if (!blockString) {
                 throw new Error('Failed to stringify block for hash calculation.');
             }
@@ -45,6 +44,12 @@ class Blockchain {
         } catch (error) {
             console.error('Error calculating hash:', error.message);
             return null;  
+        }
+    }
+
+    printBLockchain(){
+        for(let i=0;i<this.blockchain.length;i++){
+            console.log(this.blockchain[i]);
         }
     }
  
@@ -98,9 +103,9 @@ class Blockchain {
             console.log(v + " to vote for " + this.validators[v].id +" with "+this.validators[v].votes +" votes.")
         }
         var vote = prompt("Choose your vote. You can only vote once per session: ");
-        console.log(this.validators);
         this.validators[idx].voted=true;
         this.validators[vote].votes = parseInt(this.validators[vote].votes)+1;
+        console.log(this.validators);
         return "You Vote has been placed successfully";
     }
  
@@ -114,15 +119,19 @@ class Blockchain {
  
     validateBlock() {
         const validators = this.selectValidators();
+        console.log(`The top validators currently are: \n${validators}`);
         let validationCount = 0;
         for (let i = 0; i < validators.length; i++) {
-            if (validators[i].id === block.validator) {
+            if(this.isChainValid()){
                 validationCount++;
             }
         }
- 
+        console.log(`Result after voting: ${validationCount} by ${validators.length} validated the transactions`);
         return validationCount >= Math.floor(validators.length*2/3);
     }
 }
+
+ 
+
  
 module.exports = Blockchain;
