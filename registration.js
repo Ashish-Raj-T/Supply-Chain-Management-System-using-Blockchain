@@ -20,6 +20,12 @@ RegisterClient.prototype.addClient = function(id,deposit){
     if(id.length>20){
         return "Distributor Id must be at most 20 characters long";
     }
+    if(id.length==0){
+        return "Id must contain at least one character";
+    }
+    if(id.length>20){
+        return "Distributor Id must be at most 20 characters long";
+    }
     for(let i=0;i<this.clients.length;i++){
         if(id==this.clients[i].clientId){
             return "The Client Id is already in use";
@@ -39,6 +45,12 @@ RegisterClient.prototype.addClient = function(id,deposit){
 RegisterDistributor.prototype.addDistributor = function(id,deposit){
     if(deposit<this.minDeposit){
         return "The deposit amount should be greater than 200";
+    }
+    if(id.length==0){
+        return "Id must contain at least one character";
+    }
+    if(id.length>20){
+        return "Distributor Id must be at most 20 characters long";
     }
     if(id.length==0){
         return "Id must contain at least one character";
