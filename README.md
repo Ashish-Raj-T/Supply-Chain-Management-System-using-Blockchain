@@ -10,19 +10,19 @@ We are implementing the Merkle tree to calculate the root hash of all the transa
 Users can view the transaction history that is related to a product.
 
 # Technologies Used:
-•	JavaScript
-•	Node.js
+##•	JavaScript
+##•	Node.js
 Packages Used:
-•	Prompt-sync
-•	qrcode-terminal
-•	crypto-js/sha256
+##•	Prompt-sync
+##•	qrcode-terminal
+##•	crypto-js/sha256
 
 
 
 
 
 # Working of Every Module:
-# blockchain.js file:
+## blockchain.js file:
 
 <h1>Blockchain ():</h1> This function initializes an empty array called blockchain, containing all the blocks in sequential order. It will also initialize an empty array called newTransaction, including all transactions chronologically. It will also create the genesis block.
 <br><h1>addBlock ():</h1> It will have parameters of transaction data, hash of the previous block, timestamp, and soup of the current block. It will create a new block with all its data and add it to the array "blockchain."
