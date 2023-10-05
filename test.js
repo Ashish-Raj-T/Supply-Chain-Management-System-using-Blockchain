@@ -456,6 +456,7 @@ while(whatNext != 11){
                         console.log(`The transaction is being validated. The current status of the product is ${transactionStatus.status}`);
                         registerDistributors.distributors[i].deposit -= 50;
                         console.log(`The Distributor's current deposit has been reduced to ${registerDistributors.distributors[i].deposit}`);
+                        break;
                     }
                     else if(i==registerDistributors.distributors.length-1){
                         console.log(`The product was not purchased be client ${cid}`);
@@ -468,6 +469,7 @@ while(whatNext != 11){
                         console.log("The product has been delivered. Please generate QR code to check your transaction status.");
                         registerClients.clients[i].deposit -= 50;
                         console.log(`Your current deposit has been reduced to ${registerClients.clients[i].deposit}`);
+                        break;
                     }
                     else if(i==registerClients.clients.length-1){
                         console.log(`The product was not purchased be client ${cid}`);
